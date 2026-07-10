@@ -1,15 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { ZodType } from "zod";
 
-export interface AuthRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-  };
-}
 
 export const authenticate = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): void => {
@@ -43,4 +38,29 @@ export const authenticate = (
       message: "Invalid or expired access token",
     });
   }
+};
+
+export const validate = (schema: ZodType) => {
+  return (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void => {
+    const result = schema.safeParse({
+      body: req.body,
+      params: req.params,
+      query: req.query,
+    });
+
+    if (!result.success) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: result.error.flatten(),
+      });
+      return;
+    }
+
+    next();
+  };
 };
