@@ -29,6 +29,12 @@ model User {
   @@map("users")
 }
 
+enum VideoVisibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
 model Channel {
   id          String   @id @default(uuid())
   name        String
@@ -41,7 +47,27 @@ model Channel {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  videos Video[]
 
   @@map("channels")
+}
+
+model Video {
+  id           String    @id @default(uuid())
+  title        String
+  description  String?
+  videoUrl     String
+  thumbnailUrl String?
+  duration     Int?
+  viewCount    Int       @default(0)
+  visibility   String    @default("PUBLIC")
+  publishedAt  DateTime?
+  channelId    String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@map("videos")
 }

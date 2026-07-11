@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import authRouter from "./modules/auth/auth.route";
 import channelRouter from "./modules/channel/channel.route";
+import videoRouter from "./modules/video/video.route";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/channels", channelRouter);
+app.use("/api/v1/videos", videoRouter);
 
 
 export default app;
