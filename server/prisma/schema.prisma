@@ -26,6 +26,7 @@ model User {
   updatedAt    DateTime  @updatedAt
   channels     Channel[]
   subscriptions Subscription[]
+  reactions Reaction[]
 
   @@map("users")
 }
@@ -34,6 +35,11 @@ enum VideoVisibility {
   PUBLIC
   PRIVATE
   UNLISTED
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
 }
 
 model Channel {
@@ -68,6 +74,7 @@ model Video {
   channelId    String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  reactions Reaction[]
 
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
@@ -84,4 +91,19 @@ model Subscription {
   channel    Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   @@unique([subscriberId, channelId])
+}
+
+model Reaction {
+  id        String       @id @default(uuid())
+  userId    String
+  videoId   String
+  type      ReactionType
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
+  @@map("reactions")
 }
